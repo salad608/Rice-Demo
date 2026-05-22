@@ -15,17 +15,7 @@ if not api_key:
 else:
     print("1 - API Key loaded.")
 
-    # 3. Initialize client ONLY if the key exists
-    try:
-        client = OpenAI(api_key=api_key)
-
-        # 4. Fetch and print models
-        models = client.models.list()
-        for model in models.data:
-            print(model.id)
-
-    except Exception as e:
-        print(f"An error occurred: {e}")
+client = OpenAI(api_key=api_key)
 
 p=Path("AgentPersonas/ContextInt.md")
 p = Path.cwd()
