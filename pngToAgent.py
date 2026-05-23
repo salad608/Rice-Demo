@@ -629,16 +629,42 @@ def process_image_batch(
 
 
 # ============================================================================
-# ENTRY POINT
+# ENTRY POINT WITH STARTUP MODE SELECTION
 # ============================================================================
+
+def display_startup_menu() -> str:
+    """Display startup menu and return selected mode."""
+    print("\n" + "=" * 70)
+    print("SPECTROSCOPY ANALYSIS PIPELINE - STARTUP MENU")
+    print("=" * 70)
+    print("\nSelect analysis mode:\n")
+    print("  [1] DEFAULT RUNTIME")
+    print("     - Analyze entire pages as single entities")
+    print("     - Fast processing, minimal user interaction\n")
+    print("  [2] GRAPH SEPARATION WITH VALIDATION")
+    print("     - Detect & separate multiple graphs per page")
+    print("     - Manual confirmation for each detected graph")
+    print("     - Edit bounding boxes interactively\n")
+    print("  [3] GRAPH SEPARATION WITH VISUALIZATION")
+    print("     - Detect & separate multiple graphs per page")
+    print("     - Visual preview + manual validation for each graph")
+    print("     - Full interactive bounding box editor\n")
+    
+    while True:
+        choice = input("Enter your choice [1/2/3]: ").strip()
+        if choice in ["1", "2", "3"]:
+            return choice
+        print("Invalid choice. Please enter 1, 2, or 3.")
+
 
 if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(
         description=(
-            "Process PNG images from scientific documents, extract spectroscopic "
-            "intelligence via OpenAI vision, and generate Obsidian knowledge vault notes."
+            "Process PNG images from scientific documents with graph-centric or "
+            "page-centric analysis. Extract spectroscopic intelligence via OpenAI "
+            "vision and generate Obsidian knowledge vault notes."
         ),
     )
     parser.add_argument(
@@ -659,14 +685,67 @@ if __name__ == "__main__":
         default="ExtractionOutput",
         help="Directory for JSON extraction outputs.",
     )
+    parser.add_argument(
+        "--mode",
+        type=str,
+        choices=["default", "validate", "visualize"],
+        default=None,
+        help="Analysis mode: 'default' (page-centric), 'validate' (graph separation), or 'visualize' (with preview).",
+    )
+    parser.add_argument(
+        "--skip-menu",
+        action="store_true",
+        help="Skip startup menu and use --mode or default.",
+    )
 
     args = parser.parse_args()
 
-    summary = process_image_batch(
-        processed_dir=Path(args.processed_dir),
-        vault_dir=Path(args.vault_dir),
-        output_dir=Path(args.output_dir),
-    )
+    # Determine mode
+    if args.skip_menu or args.mode:
+        mode_choice = {
+            "default": "1",
+            "validate": "2",
+            "visualize": "3",
+        }.get(args.mode, "1")
+    else:
+        mode_choice = display_startup_menu()
+
+    # Route to appropriate pipeline
+    if mode_choice == "1":
+        # Default page-centric analysis
+        logger.info("Running DEFAULT RUNTIME mode (page-centric analysis)")
+        summary = process_image_batch(
+            processed_dir=Path(args.processed_dir),
+            vault_dir=Path(args.vault_dir),
+            output_dir=Path(args.output_dir),
+        )
+    else:
+        # Graph-centric analysis with validation/visualization
+        try:
+            from pngSeperation import process_image_batch as process_graphs
+            
+            validate_mode = mode_choice == "2"
+            visualize_mode = mode_choice == "3"
+            
+            if visualize_mode:
+                logger.info("Running GRAPH SEPARATION with VISUALIZATION mode")
+            else:
+                logger.info("Running GRAPH SEPARATION with VALIDATION mode")
+            
+            summary = process_graphs(
+                processed_dir=Path(args.processed_dir),
+                output_dir=Path(args.output_dir),
+                vault_dir=Path(args.vault_dir),
+                validate_crops=True,
+                enable_visualization=visualize_mode,
+            )
+        except ImportError:
+            logger.error("pngSeperation module not found. Falling back to DEFAULT RUNTIME.")
+            summary = process_image_batch(
+                processed_dir=Path(args.processed_dir),
+                vault_dir=Path(args.vault_dir),
+                output_dir=Path(args.output_dir),
+            )
 
     # Exit with appropriate code
-    sys.exit(0 if summary["status"] == "success" and summary["processed_count"] > 0 else 1)
+    sys.exit(0 if summary["status"] == "success" else 1)
