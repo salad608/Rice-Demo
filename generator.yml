@@ -1,0 +1,233 @@
+name: Training Data Generator with Peaks
+
+on:
+  workflow_dispatch:
+    inputs:
+      num_points:
+        description: 'Number of data points to generate'
+        required: true
+        default: '500'
+        type: string
+      num_peaks:
+        description: 'Number of peaks to generate'
+        required: true
+        default: '5'
+        type: string
+      peak_height:
+        description: 'Maximum peak height (units)'
+        required: true
+        default: '100'
+        type: string
+      noise_level:
+        description: 'Noise level (0.0-1.0)'
+        required: true
+        default: '0.1'
+        type: string
+      output_dir:
+        description: 'Output directory for results'
+        required: true
+        default: 'training_data'
+        type: string
+
+jobs:
+  generate-training-data:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install numpy matplotlib pandas scipy
+
+      - name: Create output directory
+        run: mkdir -p ${{ github.workspace }}/${{ inputs.output_dir }}
+
+      - name: Generate training data
+        run: |
+          python - <<EOF
+          import numpy as np
+          import pandas as pd
+          import matplotlib.pyplot as plt
+          from scipy.ndimage import gaussian_filter1d
+          import json
+          from datetime import datetime
+          
+          # Configuration
+          num_points = int('${{ inputs.num_points }}')
+          num_peaks = int('${{ inputs.num_peaks }}')
+          peak_height = float('${{ inputs.peak_height }}')
+          noise_level = float('${{ inputs.noise_level }}')
+          output_dir = '${{ github.workspace }}/${{ inputs.output_dir }}'
+          
+          # Generate x values
+          x = np.linspace(0, 100, num_points)
+          
+          # Initialize y values
+          y = np.zeros_like(x)
+          
+          # Generate peaks
+          peak_info = []
+          peak_positions = np.sort(np.random.choice(num_points, num_peaks, replace=False))
+          
+          for i, peak_idx in enumerate(peak_positions):
+              # Create gaussian peaks
+              sigma = num_points / (num_peaks * 10)
+              peak_y = peak_height * np.exp(-((x - x[peak_idx])**2) / (2 * sigma**2))
+              y += peak_y
+              
+              # Record peak information
+              peak_x = x[peak_idx]
+              peak_range_start = max(0, peak_x - (3 * sigma * 100 / num_points))
+              peak_range_end = min(100, peak_x + (3 * sigma * 100 / num_points))
+              
+              peak_info.append({
+                  'peak_id': i + 1,
+                  'center_x': float(peak_x),
+                  'center_y': float(peak_y[peak_idx]),
+                  'range_start': float(peak_range_start),
+                  'range_end': float(peak_range_end),
+                  'width': float(peak_range_end - peak_range_start)
+              })
+          
+          # Add noise
+          noise = np.random.normal(0, noise_level * peak_height, num_points)
+          y = y + noise
+          
+          # Ensure no negative values
+          y = np.maximum(y, 0)
+          
+          # Create DataFrame
+          df = pd.DataFrame({
+              'x_coordinate': x,
+              'y_value': y,
+              'point_id': np.arange(1, num_points + 1)
+          })
+          
+          # Save CSV
+          csv_path = f'{output_dir}/training_data.csv'
+          df.to_csv(csv_path, index=False)
+          print(f'✓ CSV saved to {csv_path}')
+          
+          # Save peak information as JSON
+          peaks_json_path = f'{output_dir}/peak_ranges.json'
+          with open(peaks_json_path, 'w') as f:
+              json.dump({
+                  'generated_at': datetime.now().isoformat(),
+                  'configuration': {
+                      'num_points': num_points,
+                      'num_peaks': num_peaks,
+                      'peak_height': peak_height,
+                      'noise_level': noise_level
+                  },
+                  'peaks': peak_info,
+                  'statistics': {
+                      'min_y': float(np.min(y)),
+                      'max_y': float(np.max(y)),
+                      'mean_y': float(np.mean(y)),
+                      'std_y': float(np.std(y))
+                  }
+              }, f, indent=2)
+          print(f'✓ Peak ranges saved to {peaks_json_path}')
+          
+          # Generate visualization
+          plt.figure(figsize=(14, 8))
+          
+          # Plot data
+          plt.subplot(2, 1, 1)
+          plt.plot(x, y, 'b-', linewidth=2, label='Generated Data')
+          plt.scatter([x[peak_idx] for peak_idx in peak_positions], 
+                     [y[peak_idx] for peak_idx in peak_positions],
+                     color='red', s=100, zorder=5, label='Peak Centers')
+          
+          # Highlight peak ranges
+          for peak in peak_info:
+              plt.axvspan(peak['range_start'], peak['range_end'], 
+                          alpha=0.2, color='red', label='Peak Range' if peak == peak_info[0] else '')
+          
+          plt.xlabel('X Coordinate (units)', fontsize=12)
+          plt.ylabel('Y Value (units)', fontsize=12)
+          plt.title('Generated Training Data with Peaks', fontsize=14, fontweight='bold')
+          plt.grid(True, alpha=0.3)
+          plt.legend()
+          
+          # Plot peak ranges table
+          plt.subplot(2, 1, 2)
+          plt.axis('off')
+          table_data = [['Peak ID', 'Center X', 'Center Y', 'Range Start', 'Range End', 'Width']]
+          for peak in peak_info:
+              table_data.append([
+                  str(peak['peak_id']),
+                  f"{peak['center_x']:.2f}",
+                  f"{peak['center_y']:.2f}",
+                  f"{peak['range_start']:.2f}",
+                  f"{peak['range_end']:.2f}",
+                  f"{peak['width']:.2f}"
+              ])
+          
+          table = plt.table(cellText=table_data, cellLoc='center', loc='center',
+                           colWidths=[0.12, 0.15, 0.15, 0.18, 0.18, 0.12])
+          table.auto_set_font_size(False)
+          table.set_fontsize(9)
+          table.scale(1, 2)
+          
+          # Style header row
+          for i in range(len(table_data[0])):
+              table[(0, i)].set_facecolor('#4CAF50')
+              table[(0, i)].set_text_props(weight='bold', color='white')
+          
+          plt.title('Peak Range Information', fontsize=12, fontweight='bold', pad=20)
+          
+          plt.tight_layout()
+          
+          # Save plot
+          plot_path = f'{output_dir}/training_data_visualization.png'
+          plt.savefig(plot_path, dpi=300, bbox_inches='tight')
+          print(f'✓ Visualization saved to {plot_path}')
+          
+          # Print summary
+          print('\n' + '='*60)
+          print('TRAINING DATA GENERATION SUMMARY')
+          print('='*60)
+          print(f'Total Points Generated: {num_points}')
+          print(f'Number of Peaks: {num_peaks}')
+          print(f'Peak Height (max): {peak_height} units')
+          print(f'Noise Level: {noise_level}')
+          print(f'\nData Range:')
+          print(f'  X: {np.min(x):.2f} - {np.max(x):.2f} units')
+          print(f'  Y: {np.min(y):.2f} - {np.max(y):.2f} units')
+          print(f'\nPeak Ranges:')
+          for peak in peak_info:
+              print(f"  Peak {peak['peak_id']}: [{peak['range_start']:.2f}, {peak['range_end']:.2f}] units")
+          print('='*60)
+          
+          EOF
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: training-data
+          path: ${{ inputs.output_dir }}/
+          retention-days: 30
+
+      - name: Create summary
+        run: |
+          echo "## Training Data Generation Complete ✓" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Generated Files" >> $GITHUB_STEP_SUMMARY
+          echo "- **training_data.csv** - All data points with coordinates" >> $GITHUB_STEP_SUMMARY
+          echo "- **peak_ranges.json** - Peak locations and range information" >> $GITHUB_STEP_SUMMARY
+          echo "- **training_data_visualization.png** - Graph visualization" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Configuration" >> $GITHUB_STEP_SUMMARY
+          echo "- Points: ${{ inputs.num_points }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Peaks: ${{ inputs.num_peaks }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Peak Height: ${{ inputs.peak_height }} units" >> $GITHUB_STEP_SUMMARY
+          echo "- Noise Level: ${{ inputs.noise_level }}" >> $GITHUB_STEP_SUMMARY

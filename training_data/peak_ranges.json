@@ -1,0 +1,69 @@
+{
+  "generated_at": "2026-05-23T14:40:22.003327",
+  "analysis_type": "Photoelectron Spectroscopy",
+  "configuration": {
+    "num_points": 500,
+    "num_peaks": 5,
+    "peak_height": 100.0,
+    "noise_level": 0.1,
+    "binding_energy_range_ev": [
+      0.0,
+      100.0
+    ]
+  },
+  "peaks": [
+    {
+      "peak_id": 1,
+      "center_x": 7.214428857715431,
+      "center_y": 100.0,
+      "range_start": 0.0,
+      "range_end": 19.214428857715433,
+      "width": 19.214428857715433,
+      "sigma": 4.0
+    },
+    {
+      "peak_id": 2,
+      "center_x": 31.062124248496996,
+      "center_y": 100.00000191250282,
+      "range_start": 19.062124248496996,
+      "range_end": 43.062124248497,
+      "width": 24.000000000000004,
+      "sigma": 4.0
+    },
+    {
+      "peak_id": 3,
+      "center_x": 32.86573146292585,
+      "center_y": 190.3340051293744,
+      "range_start": 20.86573146292585,
+      "range_end": 44.86573146292585,
+      "width": 24.0,
+      "sigma": 4.0
+    },
+    {
+      "peak_id": 4,
+      "center_x": 56.31262525050101,
+      "center_y": 100.0000036805626,
+      "range_start": 44.31262525050101,
+      "range_end": 68.31262525050101,
+      "width": 24.000000000000007,
+      "sigma": 4.0
+    },
+    {
+      "peak_id": 5,
+      "center_x": 98.19639278557115,
+      "center_y": 100.0,
+      "range_start": 86.19639278557115,
+      "range_end": 100.0,
+      "width": 13.803607214428851,
+      "sigma": 4.0
+    }
+  ],
+  "statistics": {
+    "min_y": 0.0,
+    "max_y": 205.98401673805049,
+    "mean_y": 46.93836730569147,
+    "std_y": 50.003833821883816,
+    "min_x": 0.0,
+    "max_x": 100.0
+  }
+}
