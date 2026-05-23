@@ -12,8 +12,9 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from scipy.ndimage import gaussian_filter1d
+from scipy.signal import find_peaks
 from dataclasses import dataclass, asdict
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, Optional
 import json
 from datetime import datetime
 from pathlib import Path
@@ -61,6 +62,7 @@ class PhotoelectronSpectroscopyDataGenerator:
             x_min: float = 0.0,
             x_max: float = 100.0,
             seed: int = None,
+            peak_placement: str = 'random',  # 'random' or 'uniform'
     ):
         """
         Initialize the photoelectron spectroscopy data generator.
@@ -73,6 +75,7 @@ class PhotoelectronSpectroscopyDataGenerator:
             x_min: Minimum x coordinate (binding energy, eV)
             x_max: Maximum x coordinate (binding energy, eV)
             seed: Random seed for reproducibility
+            peak_placement: 'random' for random placement or 'uniform' for evenly spaced peaks
         """
         self.num_points = num_points
         self.num_peaks = num_peaks
@@ -80,12 +83,14 @@ class PhotoelectronSpectroscopyDataGenerator:
         self.noise_level = noise_level
         self.x_min = x_min
         self.x_max = x_max
+        self.peak_placement = peak_placement
 
         if seed is not None:
             np.random.seed(seed)
 
         self.x = None
         self.y = None
+        self.y_before_noise = None  # Store data before noise for accurate peak detection
         self.peaks: List[PeakInfo] = []
         self.statistics: DataStatistics = None
         self.df: pd.DataFrame = None
@@ -106,35 +111,38 @@ class PhotoelectronSpectroscopyDataGenerator:
         # Calculate sigma for gaussian peaks (width of peaks)
         sigma = (self.x_max - self.x_min) / (self.num_peaks * 5)
 
-        # Generate peaks
-        peak_indices = np.sort(
-            np.random.choice(self.num_points, self.num_peaks, replace=False)
-        )
+        # Generate peak positions
+        if self.peak_placement == 'uniform':
+            # Evenly spaced peaks for more predictable, accurate placement
+            peak_x_values = np.linspace(
+                self.x_min + (self.x_max - self.x_min) * 0.1,
+                self.x_max - (self.x_max - self.x_min) * 0.1,
+                self.num_peaks
+            )
+            # Add small random jitter to avoid perfect uniformity
+            jitter = np.random.uniform(-sigma * 0.3, sigma * 0.3, self.num_peaks)
+            peak_x_values = np.clip(peak_x_values + jitter, self.x_min, self.x_max)
+        else:
+            # Random placement
+            peak_x_values = np.random.uniform(self.x_min, self.x_max, self.num_peaks)
+            peak_x_values = np.sort(peak_x_values)
 
-        for peak_id, peak_idx in enumerate(peak_indices, start=1):
-            peak_x = self.x[peak_idx]
-
+        # Generate peaks and store original peak centers
+        peak_centers_data = []
+        for peak_id, peak_x in enumerate(peak_x_values, start=1):
             # Create Gaussian peak
             gaussian = self.peak_height * np.exp(
                 -((self.x - peak_x) ** 2) / (2 * sigma ** 2)
             )
             self.y += gaussian
+            peak_centers_data.append({
+                'peak_id': peak_id,
+                'original_x': peak_x,
+                'sigma': sigma
+            })
 
-            # Calculate peak range (3-sigma rule for normal distribution)
-            range_start = max(self.x_min, peak_x - 3 * sigma)
-            range_end = min(self.x_max, peak_x + 3 * sigma)
-            peak_y = self.y[peak_idx]
-
-            # Store peak information
-            self.peaks.append(PeakInfo(
-                peak_id=peak_id,
-                center_x=float(peak_x),
-                center_y=float(peak_y),
-                range_start=float(range_start),
-                range_end=float(range_end),
-                width=float(range_end - range_start),
-                sigma=float(sigma),
-            ))
+        # Store data before noise for accurate peak detection
+        self.y_before_noise = self.y.copy()
 
         # Add Gaussian noise
         noise = np.random.normal(
@@ -147,6 +155,9 @@ class PhotoelectronSpectroscopyDataGenerator:
         # Ensure no negative values
         self.y = np.maximum(self.y, 0)
 
+        # Detect actual peak centers for improved accuracy
+        self._detect_and_store_peaks(peak_centers_data, sigma)
+
         # Calculate statistics
         self._calculate_statistics()
 
@@ -154,6 +165,65 @@ class PhotoelectronSpectroscopyDataGenerator:
         self._create_dataframe()
 
         return self.x, self.y
+
+    def _detect_and_store_peaks(self, peak_centers_data: List[Dict], sigma: float) -> None:
+        """
+        Detect actual peak centers using signal processing for improved accuracy.
+
+        Args:
+            peak_centers_data: List of dictionaries with original peak information
+            sigma: Standard deviation of the peaks
+        """
+        # Use scipy to detect peaks in the noisy data
+        # The minimum height and distance help filter out noise
+        min_height = self.peak_height * 0.2  # Peaks must be at least 20% of max height
+        min_distance = int((self.x_max - self.x_min) / (self.num_peaks * 10) / ((self.x_max - self.x_min) / self.num_points))
+
+        detected_indices, _ = find_peaks(self.y, height=min_height, distance=min_distance)
+
+        # If detection found peaks, use those; otherwise fall back to original positions
+        if len(detected_indices) >= self.num_peaks:
+            # Use the top num_peaks detected peaks
+            peak_values = self.y[detected_indices]
+            top_peak_indices = detected_indices[np.argsort(peak_values)[-self.num_peaks:]]
+            top_peak_indices = np.sort(top_peak_indices)
+
+            for peak_id, peak_idx in enumerate(top_peak_indices, start=1):
+                peak_x = self.x[peak_idx]
+                peak_y = self.y[peak_idx]
+
+                # Calculate peak range (3-sigma rule)
+                range_start = max(self.x_min, peak_x - 3 * sigma)
+                range_end = min(self.x_max, peak_x + 3 * sigma)
+
+                self.peaks.append(PeakInfo(
+                    peak_id=peak_id,
+                    center_x=float(peak_x),
+                    center_y=float(peak_y),
+                    range_start=float(range_start),
+                    range_end=float(range_end),
+                    width=float(range_end - range_start),
+                    sigma=float(sigma),
+                ))
+        else:
+            # Fallback to original positions if peak detection fails
+            for data in peak_centers_data:
+                peak_id = data['peak_id']
+                peak_x = data['original_x']
+                peak_y = self.y_before_noise[np.argmin(np.abs(self.x - peak_x))]
+
+                range_start = max(self.x_min, peak_x - 3 * sigma)
+                range_end = min(self.x_max, peak_x + 3 * sigma)
+
+                self.peaks.append(PeakInfo(
+                    peak_id=peak_id,
+                    center_x=float(peak_x),
+                    center_y=float(peak_y),
+                    range_start=float(range_start),
+                    range_end=float(range_end),
+                    width=float(range_end - range_start),
+                    sigma=float(sigma),
+                ))
 
     def _calculate_statistics(self) -> None:
         """Calculate and store data statistics"""
@@ -215,6 +285,7 @@ class PhotoelectronSpectroscopyDataGenerator:
                 'peak_height': self.peak_height,
                 'noise_level': self.noise_level,
                 'binding_energy_range_ev': [self.x_min, self.x_max],
+                'peak_placement': self.peak_placement,
             },
             'peaks': [peak.to_dict() for peak in self.peaks],
             'statistics': self.statistics.to_dict(),
@@ -410,6 +481,7 @@ class PhotoelectronSpectroscopyDataGenerator:
         print(f"  • Number of Peaks: {self.num_peaks}")
         print(f"  • Maximum Peak Intensity: {self.peak_height} counts")
         print(f"  • Noise Level: {self.noise_level}")
+        print(f"  • Peak Placement: {self.peak_placement}")
         print(f"  • Binding Energy Range: {self.x_min:.2f} - {self.x_max:.2f} eV")
 
         print(f"\n📈 Data Statistics:")
@@ -428,6 +500,237 @@ class PhotoelectronSpectroscopyDataGenerator:
         print("\n" + "=" * 75 + "\n")
 
 
+class BatchDatasetGenerator:
+    """Generate multiple datasets in batch with varying parameters"""
+
+    def __init__(self, base_output_dir: str = 'training_data_batch/'):
+        """
+        Initialize batch generator.
+
+        Args:
+            base_output_dir: Base directory for all batch outputs
+        """
+        self.base_output_dir = Path(base_output_dir)
+        self.base_output_dir.mkdir(parents=True, exist_ok=True)
+        self.batch_metadata = []
+
+    def generate_batch(
+            self,
+            batch_size: int = 10,
+            num_points: int = 500,
+            num_peaks: int = 5,
+            peak_height_range: Tuple[float, float] = (80.0, 120.0),
+            noise_level_range: Tuple[float, float] = (0.05, 0.15),
+            x_min: float = 0.0,
+            x_max: float = 100.0,
+            peak_placement: str = 'uniform',
+            save_visualizations: bool = False,
+            verbose: bool = True,
+    ) -> str:
+        """
+        Generate a batch of datasets with varying parameters.
+
+        Args:
+            batch_size: Number of datasets to generate
+            num_points: Number of data points per dataset
+            num_peaks: Number of peaks per dataset
+            peak_height_range: Range of peak heights (min, max)
+            noise_level_range: Range of noise levels (min, max)
+            x_min: Minimum binding energy
+            x_max: Maximum binding energy
+            peak_placement: 'random' or 'uniform'
+            save_visualizations: Whether to save visualization for each dataset
+            verbose: Whether to print progress
+
+        Returns:
+            Path to batch directory
+        """
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        batch_dir = self.base_output_dir / f'batch_{timestamp}'
+        batch_dir.mkdir(parents=True, exist_ok=True)
+
+        batch_info = {
+            'timestamp': timestamp,
+            'batch_size': batch_size,
+            'parameters': {
+                'num_points': num_points,
+                'num_peaks': num_peaks,
+                'peak_height_range': peak_height_range,
+                'noise_level_range': noise_level_range,
+                'binding_energy_range': [x_min, x_max],
+                'peak_placement': peak_placement,
+            },
+            'datasets': []
+        }
+
+        if verbose:
+            print(f"\n{'=' * 60}")
+            print(f"Generating batch of {batch_size} datasets")
+            print(f"Output directory: {batch_dir}")
+            print(f"{'=' * 60}\n")
+
+        for i in range(batch_size):
+            # Vary parameters within specified ranges
+            peak_height = np.random.uniform(peak_height_range[0], peak_height_range[1])
+            noise_level = np.random.uniform(noise_level_range[0], noise_level_range[1])
+
+            # Generate dataset
+            generator = PhotoelectronSpectroscopyDataGenerator(
+                num_points=num_points,
+                num_peaks=num_peaks,
+                peak_height=peak_height,
+                noise_level=noise_level,
+                x_min=x_min,
+                x_max=x_max,
+                seed=None,  # Use random seed for variation
+                peak_placement=peak_placement,
+            )
+
+            generator.generate()
+
+            # Create subdirectory for this dataset
+            dataset_dir = batch_dir / f'dataset_{i+1:03d}'
+            dataset_dir.mkdir(parents=True, exist_ok=True)
+
+            # Save files
+            csv_path = dataset_dir / 'training_data.csv'
+            json_path = dataset_dir / 'peak_ranges.json'
+
+            generator.save_csv(str(csv_path))
+            generator.save_peak_ranges(str(json_path))
+
+            # Save visualizations if requested
+            if save_visualizations:
+                graph_path = dataset_dir / 'graph_only.png'
+                generator.visualize_graph_only(str(graph_path))
+
+            # Record metadata
+            dataset_metadata = {
+                'dataset_id': i + 1,
+                'directory': str(dataset_dir.relative_to(self.base_output_dir)),
+                'parameters': {
+                    'peak_height': peak_height,
+                    'noise_level': noise_level,
+                },
+                'files': {
+                    'csv': 'training_data.csv',
+                    'json': 'peak_ranges.json',
+                    'graph': 'graph_only.png' if save_visualizations else None,
+                },
+                'num_peaks_detected': len(generator.peaks),
+            }
+            batch_info['datasets'].append(dataset_metadata)
+
+            if verbose:
+                print(f"✓ Dataset {i+1:3d}/{batch_size} generated "
+                      f"(h={peak_height:.1f}, σ_n={noise_level:.3f})")
+
+        # Save batch metadata
+        metadata_path = batch_dir / 'batch_metadata.json'
+        with open(metadata_path, 'w') as f:
+            json.dump(batch_info, f, indent=2)
+
+        if verbose:
+            print(f"\n{'=' * 60}")
+            print(f"✓ Batch generation complete!")
+            print(f"✓ Metadata saved: {metadata_path}")
+            print(f"{'=' * 60}\n")
+
+        return str(batch_dir)
+
+    def generate_batch_with_variations(
+            self,
+            batch_size: int = 10,
+            num_points: int = 500,
+            num_peaks_list: Optional[List[int]] = None,
+            peak_height: float = 100.0,
+            noise_level: float = 0.1,
+            x_min: float = 0.0,
+            x_max: float = 100.0,
+            save_visualizations: bool = False,
+            verbose: bool = True,
+    ) -> str:
+        """
+        Generate batch with specific variations (e.g., different number of peaks).
+
+        Args:
+            batch_size: Datasets per variation
+            num_points: Number of data points
+            num_peaks_list: List of peak counts to vary
+            peak_height: Peak height
+            noise_level: Noise level
+            x_min: Minimum binding energy
+            x_max: Maximum binding energy
+            save_visualizations: Whether to save visualizations
+            verbose: Whether to print progress
+
+        Returns:
+            Path to batch directory
+        """
+        if num_peaks_list is None:
+            num_peaks_list = [3, 5, 7]
+
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        batch_dir = self.base_output_dir / f'batch_variations_{timestamp}'
+        batch_dir.mkdir(parents=True, exist_ok=True)
+
+        total_datasets = batch_size * len(num_peaks_list)
+        dataset_count = 0
+
+        if verbose:
+            print(f"\n{'=' * 60}")
+            print(f"Generating {total_datasets} datasets with peak variations")
+            print(f"Peak counts: {num_peaks_list}")
+            print(f"Datasets per variation: {batch_size}")
+            print(f"Output directory: {batch_dir}")
+            print(f"{'=' * 60}\n")
+
+        for num_peaks in num_peaks_list:
+            variation_dir = batch_dir / f'peaks_{num_peaks}'
+            variation_dir.mkdir(parents=True, exist_ok=True)
+
+            if verbose:
+                print(f"\nGenerating {batch_size} datasets with {num_peaks} peaks:")
+
+            for i in range(batch_size):
+                generator = PhotoelectronSpectroscopyDataGenerator(
+                    num_points=num_points,
+                    num_peaks=num_peaks,
+                    peak_height=peak_height,
+                    noise_level=noise_level,
+                    x_min=x_min,
+                    x_max=x_max,
+                    seed=None,
+                    peak_placement='uniform',
+                )
+
+                generator.generate()
+
+                dataset_dir = variation_dir / f'dataset_{i+1:03d}'
+                dataset_dir.mkdir(parents=True, exist_ok=True)
+
+                csv_path = dataset_dir / 'training_data.csv'
+                json_path = dataset_dir / 'peak_ranges.json'
+
+                generator.save_csv(str(csv_path))
+                generator.save_peak_ranges(str(json_path))
+
+                if save_visualizations:
+                    graph_path = dataset_dir / 'graph_only.png'
+                    generator.visualize_graph_only(str(graph_path))
+
+                dataset_count += 1
+                if verbose:
+                    print(f"  ✓ Dataset {i+1:3d}/{batch_size}")
+
+        if verbose:
+            print(f"\n{'=' * 60}")
+            print(f"✓ Generated {total_datasets} datasets total!")
+            print(f"{'=' * 60}\n")
+
+        return str(batch_dir)
+
+
 def main():
     """Command-line interface for the photoelectron spectroscopy data generator"""
     parser = argparse.ArgumentParser(
@@ -436,19 +739,23 @@ def main():
         epilog="""
 Examples:
   # Generate with default settings
-  python training_data_generator.py
+  python datagen2.py
 
-  # Generate 1000 points with 8 peaks
-  python training_data_generator.py --num-points 1000 --num-peaks 8
+  # Generate 1000 points with 8 peaks using uniform placement
+  python datagen2.py --num-points 1000 --num-peaks 8 --peak-placement uniform
 
-  # Generate with custom parameters and save to specific directory
-  python training_data_generator.py --num-points 500 --peak-height 150 --output data/
+  # Generate with custom parameters
+  python datagen2.py --num-points 500 --peak-height 150 --output data/
 
-  # Skip detailed visualization
-  python training_data_generator.py --no-detailed-plot
+  # Generate batch of 20 datasets
+  python datagen2.py --batch --batch-size 20
+
+  # Generate batch with peak variations
+  python datagen2.py --batch-variations --batch-size 5 --num-peaks-list 3 5 7
         """
     )
 
+    # Single dataset arguments
     parser.add_argument('--num-points', type=int, default=500,
                         help='Number of data points (default: 500)')
     parser.add_argument('--num-peaks', type=int, default=5,
@@ -461,6 +768,9 @@ Examples:
                         help='Minimum binding energy in eV (default: 0)')
     parser.add_argument('--x-max', type=float, default=100.0,
                         help='Maximum binding energy in eV (default: 100)')
+    parser.add_argument('--peak-placement', type=str, default='random',
+                        choices=['random', 'uniform'],
+                        help='Peak placement strategy (default: random)')
     parser.add_argument('--output', type=str, default='training_data/',
                         help='Output directory (default: training_data/)')
     parser.add_argument('--seed', type=int, default=None,
@@ -470,50 +780,99 @@ Examples:
     parser.add_argument('--no-detailed', action='store_true',
                         help='Skip detailed analysis visualization')
 
+    # Batch generation arguments
+    parser.add_argument('--batch', action='store_true',
+                        help='Generate a batch of datasets')
+    parser.add_argument('--batch-size', type=int, default=10,
+                        help='Number of datasets in batch (default: 10)')
+    parser.add_argument('--peak-height-range', type=float, nargs=2, default=[80.0, 120.0],
+                        help='Range of peak heights (default: 80 120)')
+    parser.add_argument('--noise-level-range', type=float, nargs=2, default=[0.05, 0.15],
+                        help='Range of noise levels (default: 0.05 0.15)')
+    parser.add_argument('--save-batch-visualizations', action='store_true',
+                        help='Save visualizations for each batch dataset')
+
+    # Batch variations arguments
+    parser.add_argument('--batch-variations', action='store_true',
+                        help='Generate batch with peak count variations')
+    parser.add_argument('--num-peaks-list', type=int, nargs='+', default=[3, 5, 7],
+                        help='List of peak counts to generate (default: 3 5 7)')
+
     args = parser.parse_args()
 
-    # Create generator
-    generator = PhotoelectronSpectroscopyDataGenerator(
-        num_points=args.num_points,
-        num_peaks=args.num_peaks,
-        peak_height=args.peak_height,
-        noise_level=args.noise_level,
-        x_min=args.x_min,
-        x_max=args.x_max,
-        seed=args.seed,
-    )
+    if args.batch or args.batch_variations:
+        # Batch generation mode
+        batch_gen = BatchDatasetGenerator(base_output_dir=args.output)
 
-    print("🔄 Generating photoelectron spectroscopy training data...")
-    generator.generate()
+        if args.batch_variations:
+            batch_gen.generate_batch_with_variations(
+                batch_size=args.batch_size,
+                num_points=args.num_points,
+                num_peaks_list=args.num_peaks_list,
+                peak_height=args.peak_height,
+                noise_level=args.noise_level,
+                x_min=args.x_min,
+                x_max=args.x_max,
+                save_visualizations=args.save_batch_visualizations,
+                verbose=True,
+            )
+        else:
+            batch_gen.generate_batch(
+                batch_size=args.batch_size,
+                num_points=args.num_points,
+                num_peaks=args.num_peaks,
+                peak_height_range=tuple(args.peak_height_range),
+                noise_level_range=tuple(args.noise_level_range),
+                x_min=args.x_min,
+                x_max=args.x_max,
+                peak_placement=args.peak_placement,
+                save_visualizations=args.save_batch_visualizations,
+                verbose=True,
+            )
+    else:
+        # Single dataset generation mode
+        generator = PhotoelectronSpectroscopyDataGenerator(
+            num_points=args.num_points,
+            num_peaks=args.num_peaks,
+            peak_height=args.peak_height,
+            noise_level=args.noise_level,
+            x_min=args.x_min,
+            x_max=args.x_max,
+            seed=args.seed,
+            peak_placement=args.peak_placement,
+        )
 
-    # Create output directory
-    output_dir = Path(args.output)
-    output_dir.mkdir(parents=True, exist_ok=True)
+        print("🔄 Generating photoelectron spectroscopy training data...")
+        generator.generate()
 
-    # Save files
-    csv_path = output_dir / 'training_data.csv'
-    json_path = output_dir / 'peak_ranges.json'
-    graph_only_path = output_dir / 'graph_only.png'
-    detailed_analysis_path = output_dir / 'detailed_analysis.png'
+        # Create output directory
+        output_dir = Path(args.output)
+        output_dir.mkdir(parents=True, exist_ok=True)
 
-    print(f"\n💾 Saving files to {output_dir}...")
-    generator.save_csv(str(csv_path))
-    print(f"✓ CSV saved: {csv_path}")
+        # Save files
+        csv_path = output_dir / 'training_data.csv'
+        json_path = output_dir / 'peak_ranges.json'
+        graph_only_path = output_dir / 'graph_only.png'
+        detailed_analysis_path = output_dir / 'detailed_analysis.png'
 
-    generator.save_peak_ranges(str(json_path))
-    print(f"✓ Peak ranges saved: {json_path}")
+        print(f"\n💾 Saving files to {output_dir}...")
+        generator.save_csv(str(csv_path))
+        print(f"✓ CSV saved: {csv_path}")
 
-    # Print summary
-    generator.print_summary()
+        generator.save_peak_ranges(str(json_path))
+        print(f"✓ Peak ranges saved: {json_path}")
 
-    # Generate visualizations
-    if not args.no_graph_only:
-        print("📊 Generating clean graph visualization...")
-        generator.visualize_graph_only(str(graph_only_path))
+        # Print summary
+        generator.print_summary()
 
-    if not args.no_detailed:
-        print("📊 Generating detailed analysis visualization...")
-        generator.visualize_detailed_analysis(str(detailed_analysis_path))
+        # Generate visualizations
+        if not args.no_graph_only:
+            print("📊 Generating clean graph visualization...")
+            generator.visualize_graph_only(str(graph_only_path))
+
+        if not args.no_detailed:
+            print("📊 Generating detailed analysis visualization...")
+            generator.visualize_detailed_analysis(str(detailed_analysis_path))
 
 
 if __name__ == '__main__':
