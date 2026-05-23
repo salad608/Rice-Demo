@@ -1,0 +1,9 @@
+{
+  "graph_index": 3,
+  "graph_title": null,
+  "detected_peaks": [],
+  "axis_labels": null,
+  "graph_description": "The image appears to be a structural diagram rather than a spectroscopic graph. It likely represents a molecular or crystal structure with various atoms or groups connected by lines, possibly indicating bonds or interactions.",
+  "extraction_confidence": 0.9,
+  "extraction_notes": "No spectroscopic data such as peaks or axis labels are present in this image. It is a structural representation, not a spectroscopic plot."
+}

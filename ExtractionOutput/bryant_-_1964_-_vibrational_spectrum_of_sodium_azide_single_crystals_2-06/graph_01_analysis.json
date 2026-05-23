@@ -1,0 +1,43 @@
+{
+  "graph_index": 1,
+  "graph_title": null,
+  "detected_peaks": [
+    {
+      "chemical_assignment": "N-H stretch",
+      "estimated_position_ev": 3600.0,
+      "fitting_bounds": [
+        3590.0,
+        3610.0
+      ],
+      "intensity_estimate": "strong",
+      "notes": null
+    },
+    {
+      "chemical_assignment": "N-H stretch",
+      "estimated_position_ev": 3400.0,
+      "fitting_bounds": [
+        3390.0,
+        3410.0
+      ],
+      "intensity_estimate": "medium",
+      "notes": "shoulder"
+    },
+    {
+      "chemical_assignment": "N-H stretch",
+      "estimated_position_ev": 3300.0,
+      "fitting_bounds": [
+        3290.0,
+        3310.0
+      ],
+      "intensity_estimate": "weak",
+      "notes": null
+    }
+  ],
+  "axis_labels": {
+    "x": "Frequency (cm\u207b\u00b9)",
+    "y": "Energy Transmitted"
+  },
+  "graph_description": "The graph shows the infrared transmission spectra of an unspecified compound, with two different traces labeled 'a' and 'b'. The x-axis represents frequency in cm\u207b\u00b9, and the y-axis represents energy transmitted. Several peaks are visible, indicating vibrational modes, likely N-H stretches, with varying intensities.",
+  "extraction_confidence": 0.9,
+  "extraction_notes": "The chemical assignments are assumed based on typical frequency ranges for N-H stretches. The graph does not specify the compound, so assignments are tentative."
+}

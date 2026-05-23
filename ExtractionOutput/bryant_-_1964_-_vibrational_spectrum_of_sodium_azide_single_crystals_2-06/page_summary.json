@@ -1,0 +1,15 @@
+{
+  "document_metadata": {
+    "title": "Vibrational Spectrum of Sodium Azide Crystals",
+    "author": "Unknown Author",
+    "year": 2000,
+    "page_source": "Bryant - 1964 - Vibrational Spectrum of Sodium Azide Single Crystals 2-06",
+    "institution": null
+  },
+  "sample_description": "- **Document Title, Author, Year, and Publication Details**: \n  - Title: Vibrational Spectrum of Sodium Azide Crystals\n  - Authors and specific publication details are not visible on this page.\n\n- **Sample Description and Experimental Conditions**: \n  - The sample is sodium azide (NaN\u2083) single crystals.\n  - Spectra were measured at different temperatures: 298\u00b0K and 90\u00b0K.\n  - Crystal thicknesses used in experiments: 0.1 mm, 0.5 mm, and 0.8 mm.\n\n- **Spectroscopic Technique Used**: \n  - Infrared sp",
+  "experimental_technique": "Spectroscopy",
+  "chemical_species": [],
+  "methodology_notes": "",
+  "overall_findings": " unpolarized spectra were analyzed.\n  - Raman spectra were obtained using a cross polarizer.\n\n- **Overall Findings or Conclusions from the Page**: \n  - The Raman spectrum of NaN\u2083 shows three distinct depolarized bands.\n  - The line at 122 cm\u207b\u00b9 corresponds to the rotary lattice mode.\n  - The strong line at 1358 cm\u207b\u00b9 is identified as the symmetric stretching mode.\n  - Tentative assignments of vibrational modes are made based on experimental data, although numerical calculations were not performed.",
+  "page_extraction_confidence": 0.9
+}

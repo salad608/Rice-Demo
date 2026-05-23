@@ -1,0 +1,43 @@
+{
+  "graph_index": 1,
+  "graph_title": null,
+  "detected_peaks": [
+    {
+      "chemical_assignment": "N3-",
+      "estimated_position_ev": 1350.0,
+      "fitting_bounds": [
+        1340.0,
+        1360.0
+      ],
+      "intensity_estimate": "strong",
+      "notes": "sharp peak"
+    },
+    {
+      "chemical_assignment": "N3-",
+      "estimated_position_ev": 1450.0,
+      "fitting_bounds": [
+        1440.0,
+        1460.0
+      ],
+      "intensity_estimate": "medium",
+      "notes": "broad peak"
+    },
+    {
+      "chemical_assignment": "N3-",
+      "estimated_position_ev": 1550.0,
+      "fitting_bounds": [
+        1540.0,
+        1560.0
+      ],
+      "intensity_estimate": "weak",
+      "notes": "shoulder"
+    }
+  ],
+  "axis_labels": {
+    "x": "Wavenumber (cm-1)",
+    "y": "Intensity"
+  },
+  "graph_description": "The graph shows the infrared absorption spectrum of sodium azide single crystals. The spectra are plotted with wavenumber on the x-axis and intensity on the y-axis. Two different conditions are depicted: one with the (111) direction parallel and the other perpendicular to the incident beam. Several peaks are visible, indicating vibrational modes of the azide ion.",
+  "extraction_confidence": 0.9,
+  "extraction_notes": "The graph does not have a visible title. Peak assignments are based on typical azide ion vibrations."
+}
