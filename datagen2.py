@@ -168,28 +168,40 @@ class PhotoelectronSpectroscopyDataGenerator:
 
     def _detect_and_store_peaks(self, peak_centers_data: List[Dict], sigma: float) -> None:
         """
-        Detect actual peak centers using signal processing for improved accuracy.
+        Detect actual peak centers using signal processing on clean data for improved accuracy.
+
+        Uses the data BEFORE noise was added to detect true peaks, avoiding noise artifacts.
+        Then retrieves the corresponding values from the noisy data.
 
         Args:
             peak_centers_data: List of dictionaries with original peak information
             sigma: Standard deviation of the peaks
         """
-        # Use scipy to detect peaks in the noisy data
-        # The minimum height and distance help filter out noise
-        min_height = self.peak_height * 0.2  # Peaks must be at least 20% of max height
-        min_distance = int((self.x_max - self.x_min) / (self.num_peaks * 10) / ((self.x_max - self.x_min) / self.num_points))
+        # Use the clean data (before noise) to detect peaks accurately
+        # This prevents noise-induced local maxima from being selected
+        min_height = self.peak_height * 0.25  # Peaks must be at least 25% of max height
+        min_distance = int(sigma / ((self.x_max - self.x_min) / self.num_points))
 
-        detected_indices, _ = find_peaks(self.y, height=min_height, distance=min_distance)
+        # Detect peaks in clean data
+        detected_indices, properties = find_peaks(
+            self.y_before_noise,
+            height=min_height,
+            distance=min_distance
+        )
 
-        # If detection found peaks, use those; otherwise fall back to original positions
+        # If we found enough peaks, use the detected ones
         if len(detected_indices) >= self.num_peaks:
-            # Use the top num_peaks detected peaks
-            peak_values = self.y[detected_indices]
-            top_peak_indices = detected_indices[np.argsort(peak_values)[-self.num_peaks:]]
-            top_peak_indices = np.sort(top_peak_indices)
+            # Get the heights of detected peaks
+            peak_heights = properties['peak_heights']
+            
+            # Select the top num_peaks by height (these are the major peaks)
+            top_indices = np.argsort(peak_heights)[-self.num_peaks:]
+            top_indices = detected_indices[top_indices]
+            top_indices = np.sort(top_indices)
 
-            for peak_id, peak_idx in enumerate(top_peak_indices, start=1):
+            for peak_id, peak_idx in enumerate(top_indices, start=1):
                 peak_x = self.x[peak_idx]
+                # Use the NOISY data for the peak value to be realistic
                 peak_y = self.y[peak_idx]
 
                 # Calculate peak range (3-sigma rule)
@@ -206,11 +218,13 @@ class PhotoelectronSpectroscopyDataGenerator:
                     sigma=float(sigma),
                 ))
         else:
-            # Fallback to original positions if peak detection fails
-            for data in peak_centers_data:
+            # Fallback to original positions if peak detection finds too few peaks
+            # This handles edge cases with very high noise or unusual distributions
+            for idx, data in enumerate(peak_centers_data):
                 peak_id = data['peak_id']
                 peak_x = data['original_x']
-                peak_y = self.y_before_noise[np.argmin(np.abs(self.x - peak_x))]
+                peak_idx = np.argmin(np.abs(self.x - peak_x))
+                peak_y = self.y[peak_idx]
 
                 range_start = max(self.x_min, peak_x - 3 * sigma)
                 range_end = min(self.x_max, peak_x + 3 * sigma)
