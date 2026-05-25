@@ -1,0 +1,33 @@
+{
+  "graph_index": 3,
+  "graph_title": null,
+  "detected_peaks": [
+    {
+      "chemical_assignment": "N\u2083 stretching",
+      "estimated_position_ev": 1350.0,
+      "fitting_bounds": [
+        1340.0,
+        1360.0
+      ],
+      "intensity_estimate": "strong",
+      "notes": null
+    },
+    {
+      "chemical_assignment": "N\u2083 bending",
+      "estimated_position_ev": 100.0,
+      "fitting_bounds": [
+        90.0,
+        110.0
+      ],
+      "intensity_estimate": "strong",
+      "notes": null
+    }
+  ],
+  "axis_labels": {
+    "x": "\u0394\u03bd (cm\u207b\u00b9)",
+    "y": "Intensity"
+  },
+  "graph_description": "The graph displays the infrared spectrum of sodium azide crystals, showing intensity versus wavenumber (\u0394\u03bd in cm\u207b\u00b9). Two main peaks are observed, corresponding to the N\u2083 stretching and bending modes.",
+  "extraction_confidence": 0.95,
+  "extraction_notes": "The peaks are clearly defined, but the exact chemical assignments are inferred based on typical sodium azide spectra."
+}

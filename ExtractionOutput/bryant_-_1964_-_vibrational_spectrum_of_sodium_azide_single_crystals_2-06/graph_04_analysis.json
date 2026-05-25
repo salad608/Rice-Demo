@@ -1,0 +1,33 @@
+{
+  "graph_index": 4,
+  "graph_title": null,
+  "detected_peaks": [
+    {
+      "chemical_assignment": "N\u2083 stretch",
+      "estimated_position_ev": 2100.0,
+      "fitting_bounds": [
+        2090.0,
+        2110.0
+      ],
+      "intensity_estimate": "strong",
+      "notes": null
+    },
+    {
+      "chemical_assignment": "N\u2083 bend",
+      "estimated_position_ev": 2000.0,
+      "fitting_bounds": [
+        1990.0,
+        2010.0
+      ],
+      "intensity_estimate": "medium",
+      "notes": null
+    }
+  ],
+  "axis_labels": {
+    "x": "Frequency (cm\u207b\u00b9)",
+    "y": "Energy Transmitted"
+  },
+  "graph_description": "The graph shows the infrared transmission spectrum of sodium azide single crystals with a thickness of 0.1 mm. Two spectra are displayed, labeled 'a' and 'b', likely representing measurements at different temperatures or conditions. The x-axis represents frequency in cm\u207b\u00b9, and the y-axis represents energy transmitted.",
+  "extraction_confidence": 0.95,
+  "extraction_notes": "The peaks are estimated based on typical sodium azide vibrational modes. Exact positions may vary slightly."
+}

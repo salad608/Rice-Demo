@@ -1,0 +1,15 @@
+{
+  "document_metadata": {
+    "title": "** Vibrational Spectrum of Sodium Azide Single Crystals",
+    "author": "** James I. Bryant",
+    "year": 2000,
+    "page_source": "Bryant - 1964 - Vibrational Spectrum of Sodium Azide Single Crystals 2-02",
+    "institution": null
+  },
+  "sample_description": "- **Document Title:** Vibrational Spectrum of Sodium Azide Single Crystals\n- **Author:** James I. Bryant\n- **Year and Publication Details:** Published in The Journal of Chemical Physics, Volume 40, Number 11, on June 1, 1964.\n- **Sample Description and Experimental Conditions:** The study focuses on a single crystal of sodium azide (NaN\u2083). Infrared and Raman spectra were obtained at temperatures of 298\u00b0K and 90\u00b0K using grating spectrometers.\n- **Spectroscopic Technique Used:** Infrared and Raman",
+  "experimental_technique": "Spectroscopy",
+  "chemical_species": [],
+  "methodology_notes": "",
+  "overall_findings": "ell modes to irreducible representations.\n  - Medium-strength absorptions were observed, and tentative assignments were made for all bands.\n- **Overall Findings or Conclusions from the Page:** \n  - The spectra showed medium-strength absorptions and confirmed the assignment of medium-strength bands as sum and difference frequencies involving rotational motion of the azide ion as a rigid unit.\n  - Observations were in good agreement with the accepted structure described by the space group D\u2083d\u2014R3m.",
+  "page_extraction_confidence": 0.9
+}

@@ -1,0 +1,15 @@
+{
+  "document_metadata": {
+    "title": "Not explicitly provided on the page.",
+    "author": "James I. Bryant",
+    "year": 2000,
+    "page_source": "Bryant - 1964 - Vibrational Spectrum of Sodium Azide Single Crystals 2-09",
+    "institution": null
+  },
+  "sample_description": "Certainly! Here is the extracted information from the page:\n\n- **Document Title, Author, Year, and Publication Details**: \n  - Title: Not explicitly provided on the page.\n  - Author: James I. Bryant\n  - Year and Publication Details: Not explicitly provided on the page.\n\n- **Sample Description and Experimental Conditions**: \n  - The study involves a 298K single-crystal spectrum and pressed-disk spectra of a material, likely involving CO\u2082 based on context.\n\n- **Spectroscopic Technique Used**: \n  -",
+  "experimental_technique": "Spectroscopy",
+  "chemical_species": [],
+  "methodology_notes": "",
+  "overall_findings": "dy identifies and assigns various absorption bands in the spectra.\n  - It suggests that observed bands could be due to splittings of the lattice combination.\n  - Polarization effects were observed, indicating changes in intensity for different crystal orientations.\n  - The study provides insights into the symmetry and behavior of lattice vibrations in the crystal.\n\nThis page focuses on the detailed analysis of infrared spectra, particularly looking at lattice vibrations and polarization effects.",
+  "page_extraction_confidence": 0.9
+}

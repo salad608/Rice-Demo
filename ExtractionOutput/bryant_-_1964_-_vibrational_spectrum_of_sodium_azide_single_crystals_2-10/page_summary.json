@@ -1,0 +1,15 @@
+{
+  "document_metadata": {
+    "title": "** Self-Consistent-Field Theory. II. The LCAO Approximation",
+    "author": "Unknown Author",
+    "year": 2000,
+    "page_source": "Bryant - 1964 - Vibrational Spectrum of Sodium Azide Single Crystals 2-10",
+    "institution": null
+  },
+  "sample_description": "Certainly! Here's the extracted information:\n\n- **Document Title:** Self-Consistent-Field Theory. II. The LCAO Approximation\n- **Authors:** Serafin Fraga and Fraser W. Birss\n- **Year and Publication Details:** Published in The Journal of Chemical Physics, Volume 40, Number 11, on June 1, 1964. Received on October 14, 1963.\n- **Sample Description and Experimental Conditions:** The document does not provide specific details about samples or experimental conditions on this page.\n- **Spectroscopic T",
+  "experimental_technique": "Spectroscopy",
+  "chemical_species": [],
+  "methodology_notes": "",
+  "overall_findings": "ns using Slater 1s and 2s orbitals as basis functions.\n  - The notation is consistent with Part I of the series.\n- **Overall Findings or Conclusions:** \n  - The development of eigenvalue equations is presented in the context of LCAO.\n  - The equations are expressed in terms of expansion vectors and overlap matrices.\n  - The methodology maintains the correct symmetry transformation properties among orbitals.\n\nThis page primarily focuses on theoretical development rather than experimental results.",
+  "page_extraction_confidence": 0.9
+}
