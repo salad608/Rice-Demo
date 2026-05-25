@@ -1,0 +1,15 @@
+{
+  "document_metadata": {
+    "title": "Not explicitly mentioned on the page.",
+    "author": "James I. Bryant",
+    "year": 1963,
+    "page_source": "Bryant - 1964 - Vibrational Spectrum of Sodium Azide Single Crystals 2-03",
+    "institution": null
+  },
+  "sample_description": "- **Document Title, Author, Year, and Publication Details**: \n  - Title: Not explicitly mentioned on the page.\n  - Author: James I. Bryant\n  - Year: 1963\n  - Publication: J. Chem. Phys., Volume 38, Page 2845\n\n- **Sample Description and Experimental Conditions**: \n  - The study involves sodium azide (NaN\u2083) in two forms: linear azide ion in sodium azide and sodium azide crystals. The azide ion is studied in a gaseous state, while the crystals are rhombohedral, belonging to the space group D3d5\u2013R3\u0305",
+  "experimental_technique": "Spectroscopy",
+  "chemical_species": [],
+  "methodology_notes": "",
+  "overall_findings": "ing vibrations. The unit-cell method is applied to analyze vibrational modes.\n\n- **Overall Findings or Conclusions from the Page**: \n  - The azide ion in sodium azide is linear and symmetric, with specific vibrational modes identified. The sodium azide crystals have a rhombohedral structure with specific symmetry properties. The study provides a detailed analysis of vibrational modes, including acoustic, translatory, rotatory, and internal modes, and their implications for the crystal structure.",
+  "page_extraction_confidence": 0.9
+}

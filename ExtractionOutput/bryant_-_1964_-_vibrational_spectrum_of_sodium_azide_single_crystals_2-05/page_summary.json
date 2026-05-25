@@ -1,0 +1,15 @@
+{
+  "document_metadata": {
+    "title": "Not explicitly stated on the page.",
+    "author": "James I. Bryant",
+    "year": 2000,
+    "page_source": "Bryant - 1964 - Vibrational Spectrum of Sodium Azide Single Crystals 2-05",
+    "institution": null
+  },
+  "sample_description": "- **Document Title, Author, Year, and Publication Details**: \n  - Title: Not explicitly stated on the page.\n  - Author: James I. Bryant\n  - Year and Publication Details: Not explicitly stated on the page.\n\n- **Sample Description and Experimental Conditions**: \n  - Samples: Sodium azide single crystals.\n  - Conditions: Crystals were measured with the (111) direction either parallel or perpendicular to the incident spectrometer beam. Measurements were taken at 298\u00b0K and 90\u00b0K.\n\n- **Spectroscopic Te",
+  "experimental_technique": "Spectroscopy",
+  "chemical_species": [],
+  "methodology_notes": "",
+  "overall_findings": "hotometer.\n  - The exciting radiation was a 4358-\u00c5 mercury line.\n  - Spectra were measured with the sample mounted in a solid sample holder with the crystal's flat faces perpendicular to the axis of the Toronto arc.\n\n- **Overall Findings or Conclusions from the Page**: \n  - The Raman frequencies are reported with an accuracy of \u00b11 cm\u207b\u00b9.\n  - The document provides spectra for sodium azide single crystals in different orientations and temperatures, highlighting the differences in spectral features.",
+  "page_extraction_confidence": 0.9
+}

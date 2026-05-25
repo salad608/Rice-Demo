@@ -1,0 +1,33 @@
+{
+  "graph_index": 2,
+  "graph_title": null,
+  "detected_peaks": [
+    {
+      "chemical_assignment": "N3- stretching",
+      "estimated_position_ev": 700.0,
+      "fitting_bounds": [
+        690.0,
+        710.0
+      ],
+      "intensity_estimate": "strong",
+      "notes": null
+    },
+    {
+      "chemical_assignment": "N3- bending",
+      "estimated_position_ev": 500.0,
+      "fitting_bounds": [
+        490.0,
+        510.0
+      ],
+      "intensity_estimate": "medium",
+      "notes": null
+    }
+  ],
+  "axis_labels": {
+    "x": "Frequency (cm\u207b\u00b9)",
+    "y": "Energy Transmitted"
+  },
+  "graph_description": "The graph shows infrared transmission spectra of sodium azide single crystals, with two distinct spectra labeled 'a' and 'b'. The spectra display several peaks corresponding to vibrational modes of the azide ion, particularly the stretching and bending modes. The spectra are likely measured under different conditions, such as temperature or crystal orientation.",
+  "extraction_confidence": 0.95,
+  "extraction_notes": "The peaks are estimated based on typical azide ion vibrations. Specific assignments may vary based on additional context."
+}
