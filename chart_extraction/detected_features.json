@@ -1,0 +1,346 @@
+{
+  "title": "Detected Chart",
+  "extraction_confidence": 0.09678431372549019,
+  "marker_count": 25,
+  "axes": {
+    "x": {
+      "label": "Binding Energy (eV)",
+      "min": 0.0,
+      "max": 100.0,
+      "unit": "eV"
+    },
+    "y": {
+      "label": "Intensity (Counts)",
+      "min": 0.0,
+      "max": 150.0,
+      "unit": "Counts"
+    }
+  },
+  "markers": [
+    {
+      "x": 0.05793450881612091,
+      "y": 0.060781476121562955,
+      "marker_type": "peak",
+      "color_rgb": [
+        0,
+        0,
+        0
+      ],
+      "confidence": 0.10588235294117647,
+      "size": 10,
+      "label": null
+    },
+    {
+      "x": 0.05793450881612091,
+      "y": 0.11722141823444283,
+      "marker_type": "peak",
+      "color_rgb": [
+        0,
+        0,
+        0
+      ],
+      "confidence": 0.0784313725490196,
+      "size": 10,
+      "label": null
+    },
+    {
+      "x": 0.05793450881612091,
+      "y": 0.17800289435600578,
+      "marker_type": "peak",
+      "color_rgb": [
+        0,
+        0,
+        0
+      ],
+      "confidence": 0.0784313725490196,
+      "size": 10,
+      "label": null
+    },
+    {
+      "x": 0.05793450881612091,
+      "y": 0.23878437047756873,
+      "marker_type": "peak",
+      "color_rgb": [
+        0,
+        0,
+        0
+      ],
+      "confidence": 0.0784313725490196,
+      "size": 10,
+      "label": null
+    },
+    {
+      "x": 0.05793450881612091,
+      "y": 0.2821997105643994,
+      "marker_type": "peak",
+      "color_rgb": [
+        0,
+        0,
+        0
+      ],
+      "confidence": 0.0784313725490196,
+      "size": 10,
+      "label": null
+    },
+    {
+      "x": 0.09571788413098237,
+      "y": 0.060781476121562955,
+      "marker_type": "peak",
+      "color_rgb": [
+        0,
+        0,
+        0
+      ],
+      "confidence": 0.12156862745098039,
+      "size": 10,
+      "label": null
+    },
+    {
+      "x": 0.09571788413098237,
+      "y": 0.11722141823444283,
+      "marker_type": "peak",
+      "color_rgb": [
+        0,
+        0,
+        0
+      ],
+      "confidence": 0.09019607843137255,
+      "size": 10,
+      "label": null
+    },
+    {
+      "x": 0.09571788413098237,
+      "y": 0.17800289435600578,
+      "marker_type": "peak",
+      "color_rgb": [
+        0,
+        0,
+        0
+      ],
+      "confidence": 0.09411764705882353,
+      "size": 10,
+      "label": null
+    },
+    {
+      "x": 0.09571788413098237,
+      "y": 0.23878437047756873,
+      "marker_type": "peak",
+      "color_rgb": [
+        0,
+        0,
+        0
+      ],
+      "confidence": 0.09803921568627451,
+      "size": 10,
+      "label": null
+    },
+    {
+      "x": 0.09571788413098237,
+      "y": 0.2821997105643994,
+      "marker_type": "peak",
+      "color_rgb": [
+        0,
+        0,
+        0
+      ],
+      "confidence": 0.10196078431372549,
+      "size": 10,
+      "label": null
+    },
+    {
+      "x": 0.12090680100755667,
+      "y": 0.060781476121562955,
+      "marker_type": "peak",
+      "color_rgb": [
+        0,
+        0,
+        0
+      ],
+      "confidence": 0.10980392156862745,
+      "size": 10,
+      "label": null
+    },
+    {
+      "x": 0.12090680100755667,
+      "y": 0.11722141823444283,
+      "marker_type": "peak",
+      "color_rgb": [
+        0,
+        0,
+        0
+      ],
+      "confidence": 0.0784313725490196,
+      "size": 10,
+      "label": null
+    },
+    {
+      "x": 0.12090680100755667,
+      "y": 0.17800289435600578,
+      "marker_type": "peak",
+      "color_rgb": [
+        0,
+        0,
+        0
+      ],
+      "confidence": 0.0784313725490196,
+      "size": 10,
+      "label": null
+    },
+    {
+      "x": 0.12090680100755667,
+      "y": 0.23878437047756873,
+      "marker_type": "peak",
+      "color_rgb": [
+        0,
+        0,
+        0
+      ],
+      "confidence": 0.0784313725490196,
+      "size": 10,
+      "label": null
+    },
+    {
+      "x": 0.12090680100755667,
+      "y": 0.2821997105643994,
+      "marker_type": "peak",
+      "color_rgb": [
+        0,
+        0,
+        0
+      ],
+      "confidence": 0.0784313725490196,
+      "size": 10,
+      "label": null
+    },
+    {
+      "x": 0.14105793450881612,
+      "y": 0.060781476121562955,
+      "marker_type": "peak",
+      "color_rgb": [
+        0,
+        0,
+        0
+      ],
+      "confidence": 0.10980392156862745,
+      "size": 10,
+      "label": null
+    },
+    {
+      "x": 0.14105793450881612,
+      "y": 0.11722141823444283,
+      "marker_type": "peak",
+      "color_rgb": [
+        0,
+        0,
+        0
+      ],
+      "confidence": 0.0784313725490196,
+      "size": 10,
+      "label": null
+    },
+    {
+      "x": 0.14105793450881612,
+      "y": 0.17800289435600578,
+      "marker_type": "peak",
+      "color_rgb": [
+        0,
+        0,
+        0
+      ],
+      "confidence": 0.0784313725490196,
+      "size": 10,
+      "label": null
+    },
+    {
+      "x": 0.14105793450881612,
+      "y": 0.23878437047756873,
+      "marker_type": "peak",
+      "color_rgb": [
+        0,
+        0,
+        0
+      ],
+      "confidence": 0.0784313725490196,
+      "size": 10,
+      "label": null
+    },
+    {
+      "x": 0.14105793450881612,
+      "y": 0.2821997105643994,
+      "marker_type": "peak",
+      "color_rgb": [
+        0,
+        0,
+        0
+      ],
+      "confidence": 0.30980392156862746,
+      "size": 10,
+      "label": null
+    },
+    {
+      "x": 0.17716204869857263,
+      "y": 0.060781476121562955,
+      "marker_type": "peak",
+      "color_rgb": [
+        0,
+        0,
+        0
+      ],
+      "confidence": 0.10196078431372549,
+      "size": 10,
+      "label": null
+    },
+    {
+      "x": 0.17716204869857263,
+      "y": 0.11722141823444283,
+      "marker_type": "peak",
+      "color_rgb": [
+        0,
+        0,
+        0
+      ],
+      "confidence": 0.0784313725490196,
+      "size": 10,
+      "label": null
+    },
+    {
+      "x": 0.17716204869857263,
+      "y": 0.17800289435600578,
+      "marker_type": "peak",
+      "color_rgb": [
+        0,
+        0,
+        0
+      ],
+      "confidence": 0.0784313725490196,
+      "size": 10,
+      "label": null
+    },
+    {
+      "x": 0.17716204869857263,
+      "y": 0.23878437047756873,
+      "marker_type": "peak",
+      "color_rgb": [
+        0,
+        0,
+        0
+      ],
+      "confidence": 0.0784313725490196,
+      "size": 10,
+      "label": null
+    },
+    {
+      "x": 0.17716204869857263,
+      "y": 0.2821997105643994,
+      "marker_type": "peak",
+      "color_rgb": [
+        0,
+        0,
+        0
+      ],
+      "confidence": 0.0784313725490196,
+      "size": 10,
+      "label": null
+    }
+  ]
+}

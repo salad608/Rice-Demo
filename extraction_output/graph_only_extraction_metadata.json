@@ -1,0 +1,69 @@
+{
+  "title": "Photoelectron Spectroscopy - Synthetic Training Data",
+  "chart_type": "spectrum",
+  "extracted_at": "2026-05-25T09:47:11.241139",
+  "model_used": "gpt-4o",
+  "overall_confidence": 0.95,
+  "axis_calibration_confidence": 0.98,
+  "marker_detection_confidence": 0.92,
+  "axes": {
+    "x": {
+      "label": "Binding Energy",
+      "unit": "eV",
+      "min": 0.0,
+      "max": 100.0,
+      "log_scale": false
+    },
+    "y": {
+      "label": "Intensity",
+      "unit": "Counts",
+      "min": 0.0,
+      "max": 200.0,
+      "log_scale": false
+    }
+  },
+  "marker_count": 4,
+  "markers": [
+    {
+      "estimated_x": 0.08,
+      "estimated_y": 0.5,
+      "marker_type": "star",
+      "relative_height": 0.5,
+      "visibility_score": 1.0,
+      "marker_color": "red",
+      "notes": null
+    },
+    {
+      "estimated_x": 0.18,
+      "estimated_y": 0.55,
+      "marker_type": "star",
+      "relative_height": 0.55,
+      "visibility_score": 1.0,
+      "marker_color": "red",
+      "notes": null
+    },
+    {
+      "estimated_x": 0.35,
+      "estimated_y": 1.0,
+      "marker_type": "star",
+      "relative_height": 1.0,
+      "visibility_score": 1.0,
+      "marker_color": "red",
+      "notes": null
+    },
+    {
+      "estimated_x": 1.0,
+      "estimated_y": 0.6,
+      "marker_type": "star",
+      "relative_height": 0.6,
+      "visibility_score": 1.0,
+      "marker_color": "red",
+      "notes": null
+    }
+  ],
+  "suggested_model": "gaussian",
+  "data_quality_issues": [
+    "marker_count_discrepancy"
+  ],
+  "extraction_notes": null
+}

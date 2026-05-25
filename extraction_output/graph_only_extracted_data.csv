@@ -1,0 +1,5 @@
+point_id,Binding Energy (eV),Intensity (Counts),marker_type,marker_color,relative_height,visibility_score,notes
+1,8.0,100.0,star,red,0.5,1.0,
+2,18.0,89.99999999999999,star,red,0.55,1.0,
+3,35.0,0.0,star,red,1.0,1.0,
+4,100.0,80.0,star,red,0.6,1.0,
